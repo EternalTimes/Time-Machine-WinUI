@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Time Machine (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Time Machine (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
