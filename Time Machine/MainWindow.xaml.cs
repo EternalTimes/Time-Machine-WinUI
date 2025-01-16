@@ -15,6 +15,11 @@ using Microsoft.UI.Xaml.Navigation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using WinRT;
+using WinRT.Interop;
+using Microsoft.UI;
+using Microsoft.UI.Windowing;
+using Windows.UI.WindowManagement;
+using WinRT.Interop;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -29,13 +34,27 @@ namespace Time_Machine
     {
         private DesktopAcrylicController _acrylicController;
         private SystemBackdropConfiguration _backdropConfiguration;
+        private Microsoft.UI.Windowing.AppWindow m_AppWindow;
 
         public MainWindow()
         {
             this.InitializeComponent();
 
+            m_AppWindow = GetAppWindowForCurrentWindow();
+            var titleBar = m_AppWindow.TitleBar;
+            // Hide system title bar.
+            titleBar.ExtendsContentIntoTitleBar = true;
+            titleBar.ButtonBackgroundColor = Colors.Transparent;
+            titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
             // 尝试设置 Acrylic 背景
             TrySetAcrylicBackdrop();
+        }
+
+        private Microsoft.UI.Windowing.AppWindow GetAppWindowForCurrentWindow()
+        {
+            IntPtr hWnd = WindowNative.GetWindowHandle(this);
+            WindowId wndId = Win32Interop.GetWindowIdFromWindow(hWnd);
+            return Microsoft.UI.Windowing.AppWindow.GetFromWindowId(wndId);
         }
 
         private void TrySetAcrylicBackdrop()
@@ -77,6 +96,26 @@ namespace Time_Machine
                     _ => SystemBackdropTheme.Default,
                 };
             }
+        }
+
+        private void SetCustomTitleBar()
+        {
+            // 将 XAML 中定义的 CustomTitleBar 作为标题栏
+            this.SetTitleBar(CustomTitleBar);
+        }
+
+        private void ApplyAcrylicToTitleBar()
+        {
+            // 创建 Acrylic 背景刷
+            var acrylicBrush = new AcrylicBrush
+            {
+                TintColor = Microsoft.UI.Colors.Gray, // 自定义颜色
+                TintOpacity = 0.8, // 调整透明度
+                FallbackColor = Microsoft.UI.Colors.LightGray // 回退颜色
+            };
+
+            // 应用到自定义标题栏
+            CustomTitleBar.Background = acrylicBrush;
         }
 
         private void MainWindow_Closed(object sender, WindowEventArgs args)

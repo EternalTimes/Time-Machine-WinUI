@@ -9,7 +9,16 @@
     mc:Ignorable="d"
     Title="Time Machine">
 
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <Button x:Name="myButton" Click="myButton_Click">Click Me</Button>
-    </StackPanel>
+    <Grid>
+        <!-- 自定义标题栏 -->
+        <Grid x:Name="CustomTitleBar" Height="32" VerticalAlignment="Top" HorizontalAlignment="Stretch">
+            <TextBlock Text="Time Machine" VerticalAlignment="Center" Margin="12,0,0,0" FontSize="16" />
+            <!-- 你可以添加更多控件，例如按钮 -->
+        </Grid>
+
+        <!-- 主内容 -->
+        <Grid>
+            <Button x:Name="myButton" Content="Click Me" VerticalAlignment="Center" HorizontalAlignment="Center" />
+        </Grid>
+    </Grid>
 </Window>
