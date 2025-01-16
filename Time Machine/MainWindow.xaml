@@ -6,19 +6,20 @@
     xmlns:local="using:Time_Machine"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Title="Time Machine">
+    mc:Ignorable="d">
 
     <Grid>
         <!-- 自定义标题栏 -->
-        <Grid x:Name="CustomTitleBar" Height="32" VerticalAlignment="Top" HorizontalAlignment="Stretch">
-            <TextBlock Text="Time Machine" VerticalAlignment="Center" Margin="12,0,0,0" FontSize="16" />
+        <Grid x:Name="CustomTitleBar" Height="48" VerticalAlignment="Top" HorizontalAlignment="Stretch">
+            <TextBlock Text="Time Machine" VerticalAlignment="Top" Margin="64,12,0,0" FontSize="16" />
             <!-- 你可以添加更多控件，例如按钮 -->
+            <!-- 添加按钮 -->
         </Grid>
-
         <!-- 主内容 -->
         <Grid>
-            <Button x:Name="myButton" Content="Click Me" VerticalAlignment="Center" HorizontalAlignment="Center" />
+            <Button Width="72" Height="72" HorizontalAlignment="Right" VerticalAlignment="Bottom"  Margin="40,40,40,40" CornerRadius="24" Background="{ThemeResource SystemControlHighlightAccentBrush}" BorderThickness="4,4,4,4">
+                <FontIcon Glyph="&#xE710;"  FontSize="24"/>
+            </Button>
         </Grid>
     </Grid>
 </Window>
