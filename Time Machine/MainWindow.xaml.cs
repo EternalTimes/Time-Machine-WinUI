@@ -115,17 +115,71 @@ namespace Time_Machine
             _acrylicController = null;
         }
 
-        private void AddButton_Click(object sender, RoutedEventArgs e)
+        private async void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            // 在标题栏按钮点击时执行的逻辑
-            ContentDialog dialog = new ContentDialog
+            // 创建文本框
+            var textBox = new TextBox
             {
-                Title = "Add Button Clicked",
-                Content = "You clicked the Add button!",
-                CloseButtonText = "OK",
-                XamlRoot = this.Content.XamlRoot
+                PlaceholderText = "事件名称", // 灰色提示文字
+                Margin = new Thickness(0, 0, 0, 10) // 添加底部间距
             };
-            dialog.ShowAsync();
+
+            // 创建日期选择器
+            var datePicker = new CalendarDatePicker
+            {
+                Date = DateTimeOffset.Now, // 默认日期为当前日期
+                Margin = new Thickness(0, 0, 0, 10) // 与文本框保持一致的样式
+            };
+
+            // 将控件添加到 StackPanel
+            var contentStack = new StackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 24
+            };
+            contentStack.Children.Add(textBox);
+            contentStack.Children.Add(datePicker);
+            
+            // 创建对话框
+            var dialog = new ContentDialog
+            {
+                Title = "添加新事件",
+                Content = contentStack,
+                PrimaryButtonText = "保存 \\(^o^)/~",
+                CloseButtonText = "取消 ￣へ￣",
+                XamlRoot = this.Content.XamlRoot,
+                DefaultButton = ContentDialogButton.Primary
+            };
+
+            // 禁用保存按钮初始状态
+            dialog.IsPrimaryButtonEnabled = false;
+
+            // 动态监听文本输入框内容变化
+            textBox.TextChanged += (s, args) =>
+            {
+                dialog.IsPrimaryButtonEnabled = !string.IsNullOrWhiteSpace(textBox.Text);
+            };
+
+            // 显示对话框并等待用户操作
+            var result = await dialog.ShowAsync();
+
+            // 处理用户操作
+            if (result == ContentDialogResult.Primary)
+            {
+                string eventName = textBox.Text;
+                DateTimeOffset? selectedDate = datePicker.Date;
+
+                // 处理保存逻辑
+                var message = $"事件名称: {eventName}\n日期: {selectedDate?.ToString("yyyy-MM-dd") ?? "未选择"}";
+                var confirmationDialog = new ContentDialog
+                {
+                    Title = "已保存",
+                    Content = message,
+                    CloseButtonText = "确定",
+                    XamlRoot = this.Content.XamlRoot
+                };
+                await confirmationDialog.ShowAsync();
+            }
         }
     }
 }
