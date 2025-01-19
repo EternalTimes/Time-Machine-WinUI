@@ -1,4 +1,3 @@
-using DataLayer;
 using Microsoft.UI;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
@@ -8,16 +7,21 @@ using Microsoft.UI.Xaml.Media;
 using System;
 using WinRT;
 using WinRT.Interop;
-using System.Diagnostics;
+
+// To learn more about WinUI, the WinUI project structure,
+// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace Time_Machine
 {
+    /// <summary>
+    /// An empty window that can be used on its own or navigated to within a Frame.
+    /// </summary>
+
     public sealed partial class MainWindow : Window
     {
         private DesktopAcrylicController _acrylicController;
         private SystemBackdropConfiguration _backdropConfiguration;
         private Microsoft.UI.Windowing.AppWindow m_AppWindow;
-        private readonly IDataService _dataService;
 
         public MainWindow()
         {
@@ -34,10 +38,6 @@ namespace Time_Machine
             // 尝试设置 Acrylic 背景
             TrySetAcrylicBackdrop();
 
-            // 初始化数据服务
-            var (key, iv) = KeyManagementService.GetOrGenerateKeyAndIVAsync().Result;
-            string databasePath = "SecureData.db";
-            _dataService = new DataService(databasePath, key, iv);
         }
 
         private Microsoft.UI.Windowing.AppWindow GetAppWindowForCurrentWindow()
@@ -164,98 +164,21 @@ namespace Time_Machine
             var result = await dialog.ShowAsync();
 
             // 处理用户操作
-            switch (result)
+            if (result == ContentDialogResult.Primary)
             {
-                // 用户确认保存
-                case ContentDialogResult.Primary:
-                    {
-                        string eventName = textBox.Text; // 获取事件名称
-                        DateTimeOffset? selectedDate = datePicker.Date; // 获取日期
+                string eventName = textBox.Text;
+                DateTimeOffset? selectedDate = datePicker.Date;
 
-                        // 检查输入是否有效
-                        if (string.IsNullOrWhiteSpace(eventName) || !selectedDate.HasValue)
-                        {
-                            // 如果输入无效，显示错误提示
-                            var errorDialog = new ContentDialog
-                            {
-                                Title = "错误",
-                                Content = "请填写完整的事件名称和选择日期。",
-                                CloseButtonText = "确定",
-                                XamlRoot = this.Content.XamlRoot
-                            };
-                            await errorDialog.ShowAsync();
-                            break;
-                        }
-
-                        // 提示保存确认
-                        var confirmationDialog = new ContentDialog
-                        {
-                            Title = "确认保存",
-                            Content = $"事件名称: {eventName}\n日期: {selectedDate.Value:yyyy-MM-dd}",
-                            PrimaryButtonText = "确认",
-                            CloseButtonText = "取消",
-                            XamlRoot = this.Content.XamlRoot
-                        };
-
-                        var confirmationResult = await confirmationDialog.ShowAsync();
-
-                        if (confirmationResult == ContentDialogResult.Primary)
-                        {
-                            // 用户确认保存，执行保存逻辑
-                            _dataService.SaveData($"事件名称: {eventName}, 日期: {selectedDate.Value:yyyy-MM-dd}");
-
-                            // 显示保存成功提示
-                            var successDialog = new ContentDialog
-                            {
-                                Title = "保存成功",
-                                Content = "事件已成功保存！",
-                                CloseButtonText = "确定",
-                                XamlRoot = this.Content.XamlRoot
-                            };
-                            await successDialog.ShowAsync();
-                        }
-                        else
-                        {
-                            // 用户取消保存，回到编辑状态
-                            var cancelDialog = new ContentDialog
-                            {
-                                Title = "保存取消",
-                                Content = "您已取消保存，可以继续编辑。",
-                                CloseButtonText = "确定",
-                                XamlRoot = this.Content.XamlRoot
-                            };
-                            await cancelDialog.ShowAsync();
-                        }
-                        break;
-                    }
-
-                // 用户选择取消操作
-                case ContentDialogResult.Secondary:
-                    {
-                        var cancelDialog = new ContentDialog
-                        {
-                            Title = "操作已取消",
-                            Content = "您已取消操作，未保存任何数据。",
-                            CloseButtonText = "确定",
-                            XamlRoot = this.Content.XamlRoot
-                        };
-                        await cancelDialog.ShowAsync();
-                        break;
-                    }
-
-                // 其他未知结果
-                default:
-                    {
-                        var unknownDialog = new ContentDialog
-                        {
-                            Title = "未知操作",
-                            Content = "发生未知错误，未进行任何操作。",
-                            CloseButtonText = "确定",
-                            XamlRoot = this.Content.XamlRoot
-                        };
-                        await unknownDialog.ShowAsync();
-                        break;
-                    }
+                // 处理保存逻辑
+                var message = $"事件名称: {eventName}\n日期: {selectedDate?.ToString("yyyy-MM-dd") ?? "未选择"}";
+                var confirmationDialog = new ContentDialog
+                {
+                    Title = "已保存",
+                    Content = message,
+                    CloseButtonText = "确定",
+                    XamlRoot = this.Content.XamlRoot
+                };
+                await confirmationDialog.ShowAsync();
             }
         }
     }
