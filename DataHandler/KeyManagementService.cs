@@ -42,6 +42,10 @@ namespace DataLayer
 
         private static async Task<byte[]> LoadFromFileAsync(string filePath)
         {
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Key file {filePath} not found.");
+            }
             var protectedData = await File.ReadAllBytesAsync(filePath);
             var protectedBuffer = CryptographicBuffer.CreateFromByteArray(protectedData);
             var provider = new DataProtectionProvider();
