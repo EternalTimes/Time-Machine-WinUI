@@ -17,9 +17,33 @@
         </Grid>
         <!-- 主内容 -->
         <Grid>
-            <Button Click="AddButton_Click" Width="72" Height="72" HorizontalAlignment="Right" VerticalAlignment="Bottom"  Margin="40,40,40,40" CornerRadius="24" Background="{ThemeResource SystemControlHighlightAccentBrush}" BorderThickness="4,4,4,4">
-                <FontIcon Glyph="&#xE710;"  FontSize="24"/>
-            </Button>
+            <!-- 按钮容器 -->
+            <StackPanel HorizontalAlignment="Right" 
+                        VerticalAlignment="Bottom" 
+                        Margin="40,40,40,40" 
+                        Spacing="16">
+
+                <Button x:Name="DebugButton"
+                    Click="DebugButton_Click"
+                    Width="48" Height="48"
+                    CornerRadius="16"
+                    BorderThickness="4,4,4,4"
+                    HorizontalAlignment="Center">
+                    <FontIcon Glyph="&#xEEA1;" FontSize="18"/>
+                    <!-- 调试图标 -->
+                </Button>
+
+                <Button Click="AddButton_Click" 
+                    Width="72" Height="72" 
+                    CornerRadius="24" 
+                    Background="{ThemeResource SystemControlHighlightAccentBrush}" 
+                    BorderThickness="4,4,4,4"
+                    HorizontalAlignment="Right">
+                    <FontIcon Glyph="&#xE710;"  FontSize="24"/>
+                </Button>
+
+            </StackPanel>
+
         </Grid>
     </Grid>
 </Window>

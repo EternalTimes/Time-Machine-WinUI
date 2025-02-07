@@ -5,6 +5,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using System;
+using System.IO;
+using Windows.ApplicationModel;
 using WinRT;
 using WinRT.Interop;
 
@@ -180,6 +182,50 @@ namespace Time_Machine
                 };
                 await confirmationDialog.ShowAsync();
             }
+        }
+
+        private async void DebugButton_Click(object sender, RoutedEventArgs e)
+        {
+            // 获取系统信息
+            string osVersion = Environment.OSVersion.ToString();
+            string appVersion = GetAppVersion();
+            string databasePath = GetDatabasePath();
+
+            // 组合调试信息
+            string debugInfo = $"系统信息: {osVersion}\n" +
+                               $"软件版本: {appVersion}\n" +
+                               $"数据库路径: {databasePath}";
+
+            // 显示弹窗
+            var dialog = new ContentDialog
+            {
+                Title = "调试信息",
+                Content = debugInfo,
+                CloseButtonText = "关闭",
+                XamlRoot = this.Content.XamlRoot
+            };
+
+            await dialog.ShowAsync();
+        }
+
+        // 获取软件版本
+        private string GetAppVersion()
+        {
+            var version = Package.Current.Id.Version;
+            return $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+        }
+
+        // 获取数据库路径（假设数据库路径存储在文件里）
+        private string GetDatabasePath()
+        {
+            string downloadsFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+            string logFilePath = Path.Combine(downloadsFolder, "database_path.txt");
+
+            if (File.Exists(logFilePath))
+            {
+                return File.ReadAllText(logFilePath);
+            }
+            return "数据库路径未找到";
         }
     }
 }
