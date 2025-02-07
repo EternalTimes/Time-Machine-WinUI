@@ -43,6 +43,12 @@ namespace DataLayer
             command.ExecuteNonQuery();
         }
 
+        // 异常处理，使用自定义异常
+        public class DataNotFoundException : Exception
+        {
+            public DataNotFoundException(string message) : base(message) { }
+        }
+
         public string ReadData(int id)
         {
             using var connection = new SqliteConnection(_connectionString);
@@ -59,7 +65,7 @@ namespace DataLayer
                 return EncryptionService.Decrypt(encryptedData, _key, _iv);
             }
 
-            throw new Exception("Data not found.");
+            throw new DataNotFoundException($"No data found for ID {id}");
         }
     }
 }
