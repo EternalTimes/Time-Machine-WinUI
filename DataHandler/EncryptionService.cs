@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Security.Cryptography;
 
@@ -15,7 +16,11 @@ namespace DataLayer
             using var ms = new MemoryStream();
             using var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write);
             using var writer = new StreamWriter(cs);
-            writer.Write(plainText);
+            {
+                writer.Write(plainText);
+                writer.Flush();
+                cs.FlushFinalBlock(); // 确保数据完整
+            }
 
             return ms.ToArray();
         }
@@ -30,7 +35,8 @@ namespace DataLayer
             using var ms = new MemoryStream(cipherText);
             using var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read);
             using var reader = new StreamReader(cs);
-            return reader.ReadToEnd();
+            string result = reader.ReadToEnd();
+            return string.IsNullOrEmpty(result) ? throw new Exception("Decryption failed: Empty result.") : result;
         }
     }
 }
