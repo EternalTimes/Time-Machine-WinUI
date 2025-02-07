@@ -3,6 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.13.35617.110
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Time Machine", "Time Machine\Time Machine.csproj", "{3EC3EC78-58AC-4FC6-BF78-8B23A7281E3A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{093A9D39-65D3-49B0-B70C-B8AA59212761} = {093A9D39-65D3-49B0-B70C-B8AA59212761}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLayer", "DataHandler\DataLayer.csproj", "{093A9D39-65D3-49B0-B70C-B8AA59212761}"
 EndProject
