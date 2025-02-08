@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using System;
+using System.IO;
 
 namespace DataLayer
 {
@@ -9,11 +10,21 @@ namespace DataLayer
         private readonly byte[] _key;
         private readonly byte[] _iv;
 
-        public DatabaseService(string databasePath, byte[] key, byte[] iv)
+        public DatabaseService(byte[] key, byte[] iv)
         {
+            string folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TimeMachine");
+            Directory.CreateDirectory(folderPath); // 确保文件夹存在
+
+            string databasePath = Path.Combine(folderPath, "TimeMachine.db");
             _connectionString = $"Data Source={databasePath}";
+
             _key = key;
             _iv = iv;
+        }
+
+        public string GetDatabasePath()
+        {
+            return _connectionString.Replace("Data Source=", ""); // 解析数据库路径
         }
 
         public void InitializeDatabase()

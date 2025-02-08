@@ -1,3 +1,4 @@
+using DataLayer;
 using Microsoft.UI;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
@@ -5,20 +6,12 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using System;
-using System.IO;
 using Windows.ApplicationModel;
 using WinRT;
 using WinRT.Interop;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
 namespace Time_Machine
 {
-    /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
-    /// </summary>
-
     public sealed partial class MainWindow : Window
     {
         private DesktopAcrylicController _acrylicController;
@@ -189,12 +182,17 @@ namespace Time_Machine
             // 获取系统信息
             string osVersion = Environment.OSVersion.ToString();
             string appVersion = GetAppVersion();
-            string databasePath = GetDatabasePath();
+
+            // 获取数据库路径
+            var (key, iv) = await KeyManagementService.GetOrGenerateKeyAndIVAsync();
+            var dbService = new DatabaseService(key, iv);
 
             // 组合调试信息
-            string debugInfo = $"系统信息: {osVersion}\n" +
-                               $"软件版本: {appVersion}\n" +
-                               $"数据库路径: {databasePath}";
+        string debugInfo = $"系统信息: {osVersion}\n" +
+                           $"软件版本: {appVersion}\n" +
+                           $"数据库路径: {dbService.GetDatabasePath()}\n" +
+                           $"密钥路径: {KeyManagementService.GetKeyPath()}\n" +
+                           $"IV路径: {KeyManagementService.GetIVPath()}";
 
             // 显示弹窗
             var dialog = new ContentDialog
@@ -213,19 +211,6 @@ namespace Time_Machine
         {
             var version = Package.Current.Id.Version;
             return $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
-        }
-
-        // 获取数据库路径（假设数据库路径存储在文件里）
-        private string GetDatabasePath()
-        {
-            string downloadsFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
-            string logFilePath = Path.Combine(downloadsFolder, "database_path.txt");
-
-            if (File.Exists(logFilePath))
-            {
-                return File.ReadAllText(logFilePath);
-            }
-            return "数据库路径未找到";
         }
     }
 }

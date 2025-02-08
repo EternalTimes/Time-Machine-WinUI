@@ -9,17 +9,32 @@ namespace DataLayer
 {
     public static class KeyManagementService
     {
-        private static readonly string KeyPath = "key.dat";
-        private static readonly string IVPath = "iv.dat";
+        private static readonly string KeyPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TimeMachine", "key.dat");
+        private static readonly string IVPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TimeMachine", "iv.dat");
+
+        public static string GetKeyPath()
+        {
+            return KeyPath;
+        }
+
+        public static string GetIVPath()
+        {
+            return IVPath;
+        }
 
         public static async Task<(byte[] Key, byte[] IV)> GetOrGenerateKeyAndIVAsync()
         {
+            string directory = Path.GetDirectoryName(KeyPath);
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
             if (File.Exists(KeyPath) && File.Exists(IVPath))
             {
                 return (await LoadFromFileAsync(KeyPath), await LoadFromFileAsync(IVPath));
             }
 
-            // 生成新的 Key 和 IV
             using var aes = Aes.Create();
             aes.KeySize = 256;
             aes.GenerateKey();
@@ -33,10 +48,17 @@ namespace DataLayer
 
         private static async Task SaveToFileAsync(string filePath, byte[] data)
         {
+            string directory = Path.GetDirectoryName(filePath);
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
             var provider = new DataProtectionProvider("LOCAL=user");
             var buffer = CryptographicBuffer.CreateFromByteArray(data);
             var protectedBuffer = await provider.ProtectAsync(buffer);
             CryptographicBuffer.CopyToByteArray(protectedBuffer, out byte[] protectedData);
+
             await File.WriteAllBytesAsync(filePath, protectedData);
         }
 
@@ -46,6 +68,7 @@ namespace DataLayer
             {
                 throw new FileNotFoundException($"Key file {filePath} not found.");
             }
+
             var protectedData = await File.ReadAllBytesAsync(filePath);
             var protectedBuffer = CryptographicBuffer.CreateFromByteArray(protectedData);
             var provider = new DataProtectionProvider();
